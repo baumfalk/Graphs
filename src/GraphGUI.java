@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseMotionAdapter;
@@ -17,6 +18,7 @@ import java.awt.event.MouseMotionAdapter;
 @SuppressWarnings("serial")
 public class GraphGUI extends JFrame {
 
+	
 	private JPanel contentPane;
 	private int x;
 	private int y;
@@ -26,7 +28,8 @@ public class GraphGUI extends JFrame {
 	GraphUnweighted<Integer> graph;
 	protected boolean circleClicked;
 	protected Ellipse2D selectedCircle;
-
+	protected State state;
+	protected int nodeId;
 	/**
 	 * Launch the application.
 	 */
@@ -50,6 +53,7 @@ public class GraphGUI extends JFrame {
 		
 		nodeLocations = new ArrayList<Ellipse2D>();
 		graph = new GraphUnweighted<Integer>();
+		state = State.DEFAULT;
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
@@ -81,41 +85,49 @@ public class GraphGUI extends JFrame {
 		this.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				if(selectedCircle != null) {
+				if(state == State.DRAGGING_NODE) {
 					selectedCircle.setFrame(e.getX() - radius, e
 								.getY() - radius, radius * 2, radius * 2);
 					selectedCircle = null;
+					state = State.DEFAULT;
 					repaint();
-				} else{
-					boolean contained = false;
-					if(null != getOverlappingCircle(e,(radius*2)))
-						contained = true;
-					if (!contained) {
+				}  
+				
+				else {
+					boolean nodeClicked = (null != getOverlappingCircle(e.getX(),e.getY(),(radius*2)));
+					if (!nodeClicked) {
 						nodeLocations.add(new Ellipse2D.Double(e.getX() - radius, e
 								.getY() - radius, radius * 2, radius * 2));
-						graph.addNode(nodeLocations.size());
+						graph.addNode(nodeLocations.size()-1);
 						repaint();
 					}
 				}
 			}
 			@Override
 			public void mousePressed(MouseEvent e) {
-				Ellipse2D circ = getOverlappingCircle(e, 1);
+				Ellipse2D circ = getOverlappingCircle(e.getX(),e.getY(), 1);
 				if(null != circ) {
 					selectedCircle = circ;
+					state = State.DRAGGING_NODE;
 				}
 			}
 		});
 	}
 	
-	private Ellipse2D getOverlappingCircle(MouseEvent e, int extra) {
-		for (Ellipse2D circ : nodeLocations) {
+	private Ellipse2D getOverlappingCircle(int x, int y, int extra) {
+		int id = getOverlappingCircleId( x,  y,extra);
+		return (id == -1) ? null : nodeLocations.get(id);
+	}
+	
+	private int getOverlappingCircleId(int x, int y, int extra) {
+		for (int i=0;i<nodeLocations.size();i++) {
+			Ellipse2D circ = nodeLocations.get(i);
 			//radius*3 to keep some distance between nodes
-			if (circ.intersects(e.getX() - (radius+extra), e.getY() - (radius+extra), (radius+extra) * 2, (radius+extra) * 2)) {
-				return circ;
+			if (circ.intersects(x - (radius+extra), y - (radius+extra), (radius+extra) * 2, (radius+extra) * 2)) {
+				return i;
 			}
 		}
-		return null;
+		return -1;
 	}
 	
 	@Override
