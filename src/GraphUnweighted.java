@@ -23,11 +23,15 @@ public class GraphUnweighted<T> {
 	}
 
 	public boolean removeNode(T node) {
-		return removeNode(node);
+		return g.removeNode(node);
 	}
 	
 	public boolean removeEdge(T node1, T node2) {
-		return removeEdge(node1, node2);
+		return g.removeEdge(node1, node2);
+	}
+	
+	public boolean removeBiEdge(T node1, T node2) {
+		return g.removeBiEdge(node1, node2);
 	}
 	
 	public List<T> getNodes() {

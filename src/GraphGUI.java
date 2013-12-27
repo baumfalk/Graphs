@@ -81,6 +81,26 @@ public class GraphGUI extends JFrame {
 					currPoint = null;
 					repaint();
 				}
+				
+				if(e.isShiftDown()) {
+					for (int i = 0; i < nodeLocations.size(); i++) {
+						for (int j = 0; j < nodeLocations.size(); j++) {
+							graph.addBiEdge(i,j);
+						}
+					}
+					repaint();
+				}
+				
+				if(e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+					for (int i = 0; i < nodeLocations.size(); i++) {
+						for (int j = 0; j < nodeLocations.size(); j++) {
+							// TODO: fix this i Graph
+							graph.removeEdge(i, j);
+							graph.removeEdge(j, i);
+						}
+					}
+					repaint();
+				}
 			}
 			
 			public void keyReleased(KeyEvent e) {
@@ -131,16 +151,19 @@ public class GraphGUI extends JFrame {
 						repaint();
 					} else {
 						int id =  getOverlappingCircleId(e.getX(),e.getY(), 1);
-						Ellipse2D circ = nodeLocations.get(id);
-						selectedCircle = circ;
-						state = State.DRAGGING_NODE;
-						setTitle("Drag Node");
+							if(-1 != id) {
+							Ellipse2D circ = nodeLocations.get(id);
+							selectedCircle = circ;
+							state = State.DRAGGING_NODE;
+							setTitle("Drag Node");
+						}
 					}
 					break;
 				case DRAGGING_NODE:
 					selectedCircle.setFrame(e.getX() - radius, e.getY() - radius, radius * 2, radius * 2);
 					selectedCircle = null;
 					state = State.DEFAULT;
+					setTitle("Add Node");
 					repaint();
 					break;
 				case DRAWING_LINE:
@@ -148,10 +171,12 @@ public class GraphGUI extends JFrame {
 					if(-1 != id) {
 						graph.addBiEdge(nodeId, id);
 						state = State.SELECT_NODE_FOR_LINE;
+						setTitle("Click on node to connect nodes");
 						nodeId = -1;
 						currPoint = null;
 						repaint();
 					}
+				break;
 				case SELECT_NODE_FOR_LINE:
 					id =  getOverlappingCircleId(e.getX(),e.getY(), 1);
 					if(-1 != id) {

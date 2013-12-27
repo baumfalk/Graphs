@@ -63,6 +63,9 @@ public class Graph<T> {
 		return removed;
 	}
 	
+	public boolean removeBiEdge(T node1, T node2) {
+		return removeEdge(node1, node2) && removeEdge(node2, node1);
+	}
 	public List<T> getNodes() {
 		return Collections.unmodifiableList(nodes);
 	}
