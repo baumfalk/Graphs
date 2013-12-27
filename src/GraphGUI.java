@@ -22,11 +22,9 @@ public class GraphGUI extends JFrame {
 
 	
 	private JPanel contentPane;
-	private int x;
-	private int y;
 	private final int radius = 5;
-
 	ArrayList<Ellipse2D> nodeLocations;
+	
 	GraphUnweighted<Integer> graph;
 	protected boolean circleClicked;
 	protected Ellipse2D selectedCircle;
@@ -42,6 +40,7 @@ public class GraphGUI extends JFrame {
 				try {
 					GraphGUI frame = new GraphGUI();
 					frame.setVisible(true);
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -53,8 +52,6 @@ public class GraphGUI extends JFrame {
 	 * Create the frame.
 	 */
 	public GraphGUI() {
-		
-		
 		nodeLocations = new ArrayList<Ellipse2D>();
 		graph = new GraphUnweighted<Integer>();
 		state = State.DEFAULT;
@@ -63,6 +60,7 @@ public class GraphGUI extends JFrame {
 		contentPane = new JPanel();
 		
 		initListeners();
+		setTitle("Add nodes");
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
@@ -74,9 +72,11 @@ public class GraphGUI extends JFrame {
 			public void keyPressed(KeyEvent e) {
 				if(e.isControlDown() && state == State.DEFAULT) {
 					state = State.POSSIBLE_DRAWING_LINE;
+					setTitle("Click on node to connect nodes");
 				}
 				else if(e.isControlDown()) {
 					state = State.DEFAULT;
+					setTitle("Add Nodes");
 					nodeId = -1;
 					currPoint = null;
 					repaint();
@@ -134,6 +134,7 @@ public class GraphGUI extends JFrame {
 						Ellipse2D circ = nodeLocations.get(id);
 						selectedCircle = circ;
 						state = State.DRAGGING_NODE;
+						setTitle("Drag Node");
 					}
 					break;
 				case DRAGGING_NODE:
@@ -155,6 +156,7 @@ public class GraphGUI extends JFrame {
 					id =  getOverlappingCircleId(e.getX(),e.getY(), 1);
 					if(-1 != id) {
 						state = State.DRAWING_LINE;
+						setTitle("connect Nodes");
 						nodeId = id;
 					}
 					break;
